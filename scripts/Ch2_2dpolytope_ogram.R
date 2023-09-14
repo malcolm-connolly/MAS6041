@@ -3,6 +3,7 @@
 #################################################################
 library(tidyverse)
 library(data.table)
+library(ggplot2)
 library(latex2exp)
 #2D plots polytope-ogram
 #Use test2.txt to plot 
@@ -111,7 +112,7 @@ ggplot() +
 
 
 ####### Example of use ####
-sum(Dia1[,4])
+
 #This is the example from Diaconis' book.
 Dia1 <- rbind(
   c(1,2,3,242),
@@ -121,6 +122,7 @@ Dia1 <- rbind(
   c(2,3,1,12),
   c(3,2,1,359)
 )
+sum(Dia1[,4])
 
 Dia1.2d <- matrix(nrow = 6, ncol = 3)
 
@@ -129,6 +131,18 @@ for(i in 1:6){
   Dia1.2d[i,2] <- (Dia1[i,-4]-c_3)%*%(a_2-c_3)/sqrt((a_2-c_3)%*%(a_2-c_3))
   Dia1.2d[i,3] <- Dia1[i,4]
 }
+
+c_3 <- c(2,2,2) #the centre
+a_1 <- c(1,3,2) #first new axis
+(c(2,1,3)+c(1,2,3))*0.5
+a_2 <- c(1.5,1.5,3) #second new axis
+
+#vertices of hexagon
+pts <- rbind(c(sqrt(2)/2,sqrt(3/2)),c(sqrt(2),0),c(sqrt(2)/2,-sqrt(3/2)),
+             c(-sqrt(2)/2,-sqrt(3/2)),c(-sqrt(2),0), c(-sqrt(2)/2,sqrt(3/2)))
+
+#Line segments
+edges <- cbind(pts[,1],pts[,2],pts[c(2,3,4,5,6,1),1],pts[c(2,3,4,5,6,1),2])
 
 circ.df <- data.frame(x0 = Dia1.2d[,1],
                       y0 = Dia1.2d[,2],
