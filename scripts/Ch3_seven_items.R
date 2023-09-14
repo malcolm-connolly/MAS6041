@@ -1,3 +1,7 @@
+##################################################################
+##        This script is the main spectral analysis work        ##
+##          All appendix tables were produced from this         ##
+##################################################################
 library(tidyverse)
 
 
@@ -127,7 +131,6 @@ X <- list(length=factorial(7))
 #X <- matrix(nrow = 120, ncol = 120) #This is not the Cayley table, a large list.
 for(i in 1:factorial(7)){
   X[[i]] <- multi(invS7,S7,i)
-  #X[[i]] <- lapply(seq_len(factorial(7)), function(j) unclass(X[[i]])[j,])
 }
 
 for(i in 1:factorial(7)){
@@ -135,7 +138,7 @@ for(i in 1:factorial(7)){
 }
 
 #
-
+#May need to run this to get X initially, unfortunately too big for Github repo.
 saveRDS(X, file ="./data/S7/X.RData" )
 X<- readRDS("./data/S7/X.RData")
 
@@ -599,108 +602,12 @@ saveRDS(f_52,"./data/S7/f_52.RData")
 saveRDS(f_511,"./data/S7/f_511.RData")
 saveRDS(f_421,"./data/S7/f_421.RData")
 
- #### basic inference ####
-
-#dimensions
-d <- c(c.7[1],c.61[1],c.52[1],c.511[1],c.43[1],c.421[1],c.4111[1],c.331[1],c.322[1],
-       c.3211[1],c.31111[1],c.2221[1],c.22111[1],c.211111[1],c.1111111[1])
-
-N<- 5000
-
-qchisq(pchisq(d,d),d)*N/(factorial(7)^2)
-d*N/(factorial(7)^2)
-SS_scaled <- c(0.984,2.184,7.0958,1.1401,0.9299,35.55178,0.2390416,27.6791,0.420129,34.31915,0.0591376,0.067264411,5.479836,0.01324594,0.02778295)
-
-# Can compare the SS to the expected SS from the chisq distribution
-SS_scaled <- c(0.98,2.18 ,2.48,1.40,0.93,2.31 , 0.24 , 0.50, 0.42, 0.46 , 0.06 , 0.07 , 0.06, 0.01 ,0.00)
-qchisq(SS_scaled,d)*N/(factorial(7)^2)
-
-qchisq(SS_scaled,d)
-
-(d^2)*N/(factorial(7)^2)
-
-SS_scaled*factorial(7)/N
-pchisq(SS_scaled*factorial(7)/N,d^2)
-
-#Diaconis does...
-dims <- c(4,5,6,5,4,1)
-dims^2*5738/(120^2) #he just compares the means...
 
 ##### Computing projections with f - second order deltas #####
 
 #require appropriate deltas
 
 library(combinat)
-
-#threes <- combinat::combn(c(1,2,3,4,5,6,7),3) 
-
-#pairs <- combinat::combn(c(1,2,3,4,5,6,7),2) %>% t()
-#pairs[,1:2] <- sapply(pairs[,1:2], as.integer)
-
-#pick a triple and then a pair
-#setdiff(c(1,2,3,4,5,6,7),threes[,1]) %>% combn(2) %>% t()
-
-#s[1]
-
-#pairs are items (positions) and ranks (numbers in that position)
-
-#make a delta that is 1 when item 3&5 are ranked 2nd&4th in either order, zero elsewhere
-
-#for the rank order this means there should be a 2/4 in the 3rd and 5th positions
-#rank order should be _,_,2,_,4,_,_
-
-#pairs[13,] # 3&5 items
-#pairs[8,] # 2&4 ranks
-
-#idea is to create a list of all strings and match these to s, 
-# putting a 1 in vector delta for those matched values
-
-
-
-
-#fillerlist <- setdiff(c(1,2,3,4,5,6,7),pairs[8,]) %>% permn()
-#pairlist <- pairs[8,] %>% permn()
-#pairlist[[1]][1]
-
-
-#pairpos <- pairs[13,]
-#pairpos
-#otherpos <- setdiff(c(1,2,3,4,5,6,7),pairs[13,])
-#otherpos[1:5]
-
-
-#matchlist <- list(length=240)
-#for(i in 1:240){
-#  matchlist[[i]] <- rep(0,7)
-#}
-#ctr <- 0
-#for(i in 1:length(pairlist)){
-#  ctr <- ctr + 1
-#  for(j in 1:length(fillerlist)){
-#    matchlist[[ctr]][pairpos[1:2]] <- pairlist[[i]][1:2]
-#    matchlist[[ctr]][otherpos[1:5]] <- fillerlist[[j]][1:5]
-#    matchlist[[ctr]] <- matchlist[[ctr]] %>% sapply(as.integer)
-#    ctr <- ctr + 1
-#  }
-#  ctr <- ctr - 1
-#}
-
-
-
-#match(matchlist[1],s)
-#s[match(matchlist,s)] #corrected :)
-
-# delta.35_24 <- vector(length = factorial(7))
-# delta.35_24 <- rep(0,factorial(7))
-# for(i in 1:length(matchlist)){
-#   delta.35_24[match(matchlist[i],s)] <- 1
-# }
-# 
-# f_52 %*% delta.35_24 #546
-
-#ok generalise this so that I can get all 21^2 deltas in one big list.
-#then I will calculate the inner products later
-
 
 pairs <- combinat::combn(c(1,2,3,4,5,6,7),2) %>% t()
 pairs[,1:2] <- sapply(pairs[,1:2], as.integer)
@@ -738,33 +645,21 @@ for(i in 1:nrow(pairs)){
   flush.console()
 }
 
-#which(Delta[[260]] != delta.35_24) #all equal, checked :)
 
-#saveRDS(Delta,"./data/S7/Delta_corrected.RData")
 saveRDS(f_52,"./data/S7/f_52.RData")
 
 Effects_52 <- matrix(nrow=21,ncol=21)
 
-ctr.Delta <- 0
-for(i in 1:21){
-  for(j in 1:21){
-    ctr.Delta <- ctr.Delta + 1
-    Effects_52[i,j] <- Delta[[ctr.Delta]]%*%f_52
-  }
-}
 
 max(Effects_52)
 
 
 min(Effects_52)
 
-write.csv(Effects_52,"./data/S7/Effects_52.csv")
+#write.csv(Effects_52,"./data/S7/Effects_52.csv")
 
 
-
-
-
-##### Attempting the higher order effects ######
+##### Higher order effects ######
 
 library(combinat)
 
@@ -938,34 +833,6 @@ for(i in 1:nrow(tab21)){
   flush.console()
 }
 
-#which(Delta_421[[260]] != delta.35_24) #all equal, checked :)
-#saveRDS(Delta_421,"./data/S7/Delta_421.RDS")
-#Check...
-
-tab21[(tab21[,1]==1 & tab21[,2]==5)|(tab21[,1]==5 & tab21[,2]==1),]
-which((tab21[,1]==1 & tab21[,2]==5)|(tab21[,1]==5 & tab21[,2]==1))
-tab21[42,]
-
-tab21[(tab21[,1]==1 & tab21[,2]==2)|(tab21[,1]==2 & tab21[,2]==1),]
-which((tab21[,1]==1 & tab21[,2]==2)|(tab21[,1]==2 & tab21[,2]==1))
-tab21[15,]
-
-#42nd row, 15th column
-#41*105 +15 = 4320
-
-#which(Delta_421[[4320]] != delta.15_7.12_7)
-
-# Now computing the inner products
-
-# Effects_421 <- matrix(nrow=105,ncol=105)
-# 
-# ctr.Delta <- 0
-# for(i in 1:105){
-#   for(j in 1:105){
-#     ctr.Delta <- ctr.Delta + 1
-#     Effects_421[i,j] <- Delta_421[[ctr.Delta]]%*%f_421
-#   }
-# }
 
 max(Effects_421)
 
@@ -976,44 +843,7 @@ write.csv(Effects_421,"./data/S7/Effects_421.csv")
 
 tab21
 
-Effects_421_col <- Effects_421[,order(tab21[,3])]
-write.csv(Effects_421_col,"./data/S7/Effects_421_col.csv")
-
-#[52,]    3    6    2   
-#[53,]    2    6    3
-#[54,]    2    3    6
-
-
-
-# tab21[102,]
-# # relabelled items 4,6,7 ... so {6,8} {9} 
-# 
-# tab21[105,]
-# # in places {5,6}{7} So last place to 9 with bottom to 6 and 8 in either order
-# 
-# tab21[103,] # 6 7 5
-# # least 'close' in places {6,7} {5} to items {6,8} {9}
-# # A strong pull away from ranking 9 above a joint bottom 6&8 in either order. 
-# 
-# # another small no. in row 98
-# tab21[98,]# relabelled items4 7 5, so
-# 
-# #These rows / columns have values large in absolute value (more than 3 sd)
-# red_rows <- c(15,41,42,44,50,63,64,66,70,72,78,
-#               81,90,92,97,98,99,101,102,104,105)
-# 
-# 
-# red_cols <- c(1,9,10,13,15,38,41,42,43,44,45,68,71,72,75,103,105)
-# 
-# 
-# Effects_421 <- read.csv("./data/S7/Effects_421.csv")
-# Effects_421<- Effects_421[,-1]
-# 
-# Red_Effects <- Effects_421[red_rows,]
-# Red_Effects <- Red_Effects[,red_cols]
-# 
-# 
-# Red_Effects[,1:17] <- sapply(Red_Effects[,1:17], round)
+#Effects_421_col <- Effects_421[,order(tab21[,3])]
 
 
 s <- readRDS("./data/S7/s.RData")
@@ -1147,19 +977,6 @@ f_331 <- readRDS("./data/S7/f_331.RData")
 f_3211 <- readRDS("./data/S7/f_3211.RData")
 
 
-r_31<- c(1,2,5,6,9,10,11,12,15,16,19,20,22,23,28,33,38,39,42,59,66,75,
-81,83,84,85,86,88,93,95,96,97,98,100,101,103,105,106,107,109,
-112,114,115,116,118,120,121,123,124,125,126,127,129,132,134,135,136,138,140)
-
-tab31[r_31,]
-c_31 <- c(1,2,3,4,5,10,11,16,17,18,19,20,
-30,31,32,41,44,57,60,61,62,68,69,72,73,79,
-80,81,82,85,90,91,96,99,100,121,122,123,124,125,
-130,131,136,137,138,139,140)
-tab31[c_31,]
-
-
-
 
 #### space 3211 ####
 
@@ -1192,125 +1009,9 @@ tab211
 
 nrow(tab211)
 
-tab211_rows <- tab211[order(tab211[,3],tab211[,4]),] #putting it in order by the singletons
+#tab211_rows <- tab211[order(tab211[,3],tab211[,4]),] #putting it in order by the singletons
 
-
-# Adapt...
-
-
-#Adapt this :
-Delta_211 <- list(length=nrow(tab211)^2)
-
-matchlist <- list(length=420)
-for(i in 1:420){
-  matchlist[[i]] <- rep(0,7)
-}
-ctr <- 0
-ctr.Delta <- 0
-m<-1
-i<- 1
-for(i in 1:nrow(tab211)){
-  items <- tab211[i,]
-  pairpos <- items[1:2]
-  sgtnpos <- items[3:4]
-  vacant <- setdiff(c(1,2,3,4,5,6,7),items)
-  for(j in 1:nrow(tab211)){
-    ranks <- tab211[j,1:2] %>% permn()
-    for(m in 1:length(ranks)){
-      ranks[[m]] <- union(ranks[[m]],tab211[j,3:4])
-    }
-    filler <- setdiff(c(1,2,3,4,5,6,7),tab211[j,]) %>% permn()
-    ctr <- 0
-    delta <- rep(0, factorial(7))
-    for(k in 1:length(ranks)){
-      ctr <- ctr + 1
-      for(l in 1:length(filler)){
-        matchlist[[ctr]][pairpos[1:2]] <- ranks[[k]][1:2]
-        matchlist[[ctr]][sgtnpos[1:2]] <- ranks[[k]][3:4]
-        matchlist[[ctr]][vacant[1:3]] <- filler[[l]][1:3]
-        matchlist[[ctr]] <- matchlist[[ctr]] %>% sapply(as.integer)
-        ctr <- ctr + 1
-      }
-      ctr <- ctr - 1
-    }
-    delta[match(matchlist,s)] <- 1
-    ctr.Delta <- ctr.Delta + 1
-    Delta_211[[ctr.Delta]] <- delta
-  }
-
-}
-
-#Error: cannot allocate vector of size 64 Kb
-#Error: cannot allocate vector of size 2.0 Mb
-
-# Trying a sparse matrix
-s <- readRDS("./data/S7/s.RData")
-library(Matrix)
-Delta_211 <- Matrix(0, nrow = 420^2,ncol = factorial(7),sparse=TRUE)
-
-matchlist <- list(length=420) 
-for(i in 1:420){
-  matchlist[[i]] <- rep(0,7)
-}
-ctr <- 0
-ctr.Delta <- 0
-for(i in 1:nrow(tab211)){
-  items <- tab211[i,]
-  pairpos <- items[1:2]
-  sgtnpos <- items[3:4]
-  vacant <- setdiff(c(1,2,3,4,5,6,7),items)
-  for(j in 1:nrow(tab211)){
-    ranks <- tab211[j,1:2] %>% permn()
-    for(m in 1:length(ranks)){
-      ranks[[m]] <- union(ranks[[m]],tab211[j,3:4])
-    }
-    filler <- setdiff(c(1,2,3,4,5,6,7),tab211[j,]) %>% permn()
-    ctr <- 0
-    delta <- rep(0, factorial(7))
-    for(k in 1:length(ranks)){
-      ctr <- ctr + 1
-      for(l in 1:length(filler)){
-        matchlist[[ctr]][pairpos[1:2]] <- ranks[[k]][1:2]
-        matchlist[[ctr]][sgtnpos[1:2]] <- ranks[[k]][3:4]
-        matchlist[[ctr]][vacant[1:3]] <- filler[[l]][1:3]
-        matchlist[[ctr]] <- matchlist[[ctr]] %>% sapply(as.integer)
-        ctr <- ctr + 1
-      }
-      ctr <- ctr - 1
-    }
-    delta[match(matchlist,s)] <- 1
-    ctr.Delta <- ctr.Delta + 1
-    Delta_211[ctr.Delta,] <- delta
-  }
-  print(i)
-  flush.console()
-}
-
-#another option if this does not work is to directly compute the effects within the loop
-#so that Delta is not stored, rather delta is overwritten each iteration
-f_3211 <- readRDS("./data/S7/f_3211.RData")
-ctr.Delta <- 0
-ctr <-0
-E_3211 <- matrix(nrow=420,ncol=420)
-for(i in 1:420){
-  for(j in 1:420){
-    ctr <- ctr + 1
-    E_3211[i,j] <- Delta_211[ctr,]%*%f_3211
-  }
-  print(i)
-  flush.console()
-}
-
-
-
-E_reordered <- E_3211[order(tab211[,3],tab211[,4]),]
-
-write.csv(E_reordered, "./data/S7/E3211.csv") 
-write.csv(E_3211,"./data/S7/E3211_noreordering.csv")
-max(E_3211)
-min(E_3211) #didn't work all the same....
-
-tab211_rows <- tab211[order(tab211[,3],tab211[,4]),]
+#tab211_rows <- tab211[order(tab211[,3],tab211[,4]),]
 
 #### ####
 library(combinat)
@@ -1370,9 +1071,6 @@ max(Effects_11)
 
 min(Effects_11)
 
-write.csv(Effects_11,"./data/S7/Effects_11.csv")
-
-tab11
 
 #this duplicated information... need to consider only items {a}{b} in {c}{d} not {b}{a} in {d}{c} too.
 
@@ -1419,7 +1117,6 @@ max(Effects_1)
 
 min(Effects_1)
 
-write.csv(Effects_1,"./data/S7/Effects_1.csv")
 
 
 
