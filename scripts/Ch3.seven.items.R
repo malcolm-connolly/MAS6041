@@ -122,7 +122,7 @@ saveRDS(invS7, file ="./data/S7/invS7.RData" )
 
 chi.7 <- rep(1,factorial(7))
 
-multi <-function(x = permutation(),y = permutation(),i=integer()){
+outer <-function(x = permutation(),y = permutation(),i=integer()){
   x*y[i]
 }  
 
@@ -130,7 +130,7 @@ multi <-function(x = permutation(),y = permutation(),i=integer()){
 X <- list(length=factorial(7))
 #X <- matrix(nrow = 120, ncol = 120) #This is not the Cayley table, a large list.
 for(i in 1:factorial(7)){
-  X[[i]] <- multi(invS7,S7,i)
+  X[[i]] <- outer(invS7,S7,i)
 }
 
 for(i in 1:factorial(7)){
